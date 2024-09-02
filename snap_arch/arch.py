@@ -42,13 +42,13 @@ class BackupHandler(FileSystemEventHandler):
         self.cleanup_and_rotate_backups(src_path)
 
         # Move the file to the final destination
-        destination_path = os.path.join(self.config['final_destination'], os.path.basename(src_path))
+        destination_path = os.path.join(self.config['archive_directory'], os.path.basename(src_path))
         shutil.move(src_path, destination_path)
         LOGGER.info(f"Moved {src_path} to {destination_path}")
 
     def cleanup_and_rotate_backups(self, src_path):
         """Clean up old backups of the same name and rotate the remaining files."""
-        destination_path = self.config['final_destination']
+        destination_path = self.config['archive_directory']
         base_name = os.path.basename(src_path)
         name_without_ext, ext = os.path.splitext(base_name)
         

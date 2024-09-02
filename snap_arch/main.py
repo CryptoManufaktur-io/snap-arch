@@ -5,8 +5,8 @@ import time
 
 import toml
 
-import snap
-import arch
+from snap_arch import snap
+from snap_arch import arch
 
 logging.basicConfig()
 

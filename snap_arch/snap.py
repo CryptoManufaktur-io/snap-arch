@@ -57,14 +57,18 @@ def perform_snapshot(chain, config):
     # Name format for the snapshot
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     snapshot_name = chain['snapshot_name_format'].replace("{timestamp}", timestamp)
-
-    # Tar snapshot to temp path
-    LOGGER.info("Compressing file...")
     snapshot_path = os.path.join(tempfile.mkdtemp(), snapshot_name)
 
-    execute_command(f"tar c {chain['snapshot_output_path']} | lz4 -z - {snapshot_path}")
+    # Tar snapshot to temp path if necessary
+    if chain['compress_snapshot']:
+        LOGGER.info("Compressing file...")
 
-    LOGGER.info(f"Compressed snapshot located in temp path: {snapshot_path}")
+        execute_command(f"tar c {chain['snapshot_output_path']} | lz4 -z - {snapshot_path}")
+
+        LOGGER.info(f"Compressed snapshot located in temp path: {snapshot_path}")
+    else:
+        # Otherwise just move it to the temp folder.
+        execute_command(f"mv {chain['snapshot_output_path']} {snapshot_path}")
 
     # Transfer snapshot to server
     if config['protocol'] == 'scp':
