@@ -1,0 +1,34 @@
+# Must be running in either snap or arch mode.
+running_mode = "snap"
+
+# Snap Config
+server = "example.com"
+protocol = "scp"
+credentials = "username"
+
+[[chains]]
+destination_path = "/path/to/uploads/folder"
+local_path = "/home/metis"
+start_chain_command = "./ethd up"
+stop_command = "./ethd stop" # Leave empty if stop is not needed.
+snapshot_command = "docker compose run --rm create-snapshot"
+snapshot_name_format = "metis_l1_dtl.tar.lz4"
+snapshot_output_path = "/path/to/generated/snapshot" # Path where the generated snapshot is expected after the command is executed.
+schedule_time = "0 1 * * *"  # Scheduled everyday at 1am
+
+[[chains]]
+destination_path = "/path/to/uploads/folder"
+local_path = "/home/metis"
+start_chain_command = "./ethd up"
+stop_command = "./ethd stop" # Leave empty if stop is not needed.
+snapshot_command = "docker compose run --rm create-snapshot"
+snapshot_name_format = "metis_l1_dtl.tar.lz4"
+snapshot_output_path = "/path/to/generated/snapshot" # Path where the generated snapshot is expected after the command is executed.
+schedule_time = "0 1 * * *"  # Scheduled everyday at 1am
+
+# Arch config
+running_mode = "arch"
+
+watch_directory = "/path/to/watch"
+final_destination = "/path/to/final/destination"
+keep_latest = 2  # Number of latest snapshots to keep

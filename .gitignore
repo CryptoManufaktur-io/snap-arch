@@ -1,0 +1,13 @@
+.DS_Store
+
+# VS Code
+.vscode
+
+__pycache__
+
+# Config
+config.toml
+
+# Build executables and resources
+build/
+snap-arch.spec
