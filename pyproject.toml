@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["concentricspheres <107502292+concentricspheres@users.noreply.github.com>"]
 readme = "README.md"
+packages = [{include = "snap_arch"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.14"
