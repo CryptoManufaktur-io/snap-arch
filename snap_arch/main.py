@@ -24,7 +24,7 @@ def load_config(config_file):
         config = toml.load(file)
     return config
 
-if __name__ == "__main__":
+def run():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, help='/path/to/config.toml')
     args = parser.parse_args()
@@ -45,3 +45,6 @@ if __name__ == "__main__":
                 exit()
     else:
         LOGGER.error('Missing parameter --config')
+
+if __name__ == "__main__":
+    run()

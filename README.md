@@ -23,7 +23,7 @@ poetry install
 ### Running locally
 
 ```shell
-poetry run python snap_arch/main.py --config /path/to/config.toml
+poetry run snap-arch --config /path/to/config.toml
 ```
 
 ### Building Executable

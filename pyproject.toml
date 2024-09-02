@@ -13,7 +13,9 @@ toml = "^0.10.2"
 watchdog = "^5.0.0"
 pyinstaller = "^6.10.0"
 
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+snap-arch = 'snap_arch.main:run'
