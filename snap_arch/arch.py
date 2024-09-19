@@ -9,8 +9,11 @@ from watchdog.events import FileSystemEventHandler
 LOGGER = logging.getLogger()
 
 class BackupHandler(FileSystemEventHandler):
-    def __init__(self, config):
+    def __init__(self, config, watch_directory, archive_directory, keep_latest):
         self.config = config
+        self.watch_directory = watch_directory
+        self.archive_directory = archive_directory
+        self.keep_latest = keep_latest
 
     def on_created(self, event):
         if not event.is_directory:
@@ -38,62 +41,43 @@ class BackupHandler(FileSystemEventHandler):
     def process_new_file(self, src_path):
         LOGGER.info(f"New file detected: {src_path}")
         
-        # Clean up and rotate backups
-        self.cleanup_and_rotate_backups(src_path)
-
         # Move the file to the final destination
-        destination_path = os.path.join(self.config['archive_directory'], os.path.basename(src_path))
+        destination_path = os.path.join(self.archive_directory, os.path.basename(src_path))
         shutil.move(src_path, destination_path)
         LOGGER.info(f"Moved {src_path} to {destination_path}")
-
-    def cleanup_and_rotate_backups(self, src_path):
-        """Clean up old backups of the same name and rotate the remaining files."""
-        destination_path = self.config['archive_directory']
-        base_name = os.path.basename(src_path)
-        name_without_ext, ext = os.path.splitext(base_name)
         
-        # Find all existing backups of the same base name
-        matching_files = sorted(
-            [f for f in os.listdir(destination_path) if f.startswith(name_without_ext) and f.endswith(ext)],
-            key=lambda f: os.path.getmtime(os.path.join(destination_path, f)),
+        # Clean up old backups
+        self.cleanup_old_backups()
+
+    def cleanup_old_backups(self):
+        """Delete old backups if they exceed the keep count."""
+        files = sorted(
+            [os.path.join(self.archive_directory, f) for f in os.listdir(self.archive_directory) if os.path.isfile(os.path.join(self.archive_directory, f))],
+            key=lambda f: os.path.getmtime(f),
             reverse=True
         )
 
-        keep_count = self.config.get('keep_latest', 2)
-
-        # Delete older backups if they exceed the keep count
-        if len(matching_files) >= keep_count:
-            for file_to_delete in matching_files[keep_count-1:]:
-                os.remove(os.path.join(destination_path, file_to_delete))
+        if len(files) > self.keep_latest:
+            for file_to_delete in files[self.keep_latest:]:
+                os.remove(file_to_delete)
                 LOGGER.info(f"Deleted old backup: {file_to_delete}")
-
-        # Find all existing backups of the same base name, again.
-        matching_files = sorted(
-            [f for f in os.listdir(destination_path) if f.startswith(name_without_ext) and f.endswith(ext)],
-            key=lambda f: os.path.getmtime(os.path.join(destination_path, f)),
-            reverse=True
-        )
-
-        # Rotate the remaining files
-        for i in range(len(matching_files) - 1, 0, -1):
-            old_file = os.path.join(destination_path, matching_files[i])
-            new_file = os.path.join(destination_path, f"{name_without_ext}.{i+1}{ext}")
-            os.rename(old_file, new_file)
-            LOGGER.info(f"Rotated {old_file} to {new_file}")
-
-        # The most recent backup will be renamed to .1
-        if matching_files:
-            latest_file = os.path.join(destination_path, matching_files[0])
-            new_name = os.path.join(destination_path, f"{name_without_ext}.1{ext}")
-            os.rename(latest_file, new_name)
-            LOGGER.info(f"Renamed {latest_file} to {new_name}")
 
 def start(config):
     observer = Observer()
-    event_handler = BackupHandler(config)
-    observer.schedule(event_handler, path=config['watch_directory'], recursive=False)
+    handlers = []
+
+    for watch_config in config['directories']:
+        event_handler = BackupHandler(
+            config=config,
+            watch_directory=watch_config['watch_directory'],
+            archive_directory=watch_config['archive_directory'],
+            keep_latest=watch_config.get('keep_latest', 2)
+        )
+        observer.schedule(event_handler, path=watch_config['watch_directory'], recursive=False)
+        handlers.append(event_handler)
+        LOGGER.info(f"Watching directory: {watch_config['watch_directory']} with destination: {watch_config['archive_directory']}")
+
     observer.start()
-    LOGGER.info(f"Watching directory: {config['watch_directory']}")
 
     try:
         while True:

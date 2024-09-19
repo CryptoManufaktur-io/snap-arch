@@ -12,7 +12,7 @@ local_path = "/home/metis"
 start_chain_command = "./ethd up"
 stop_command = "./ethd stop" # Leave empty if stop is not needed.
 snapshot_command = "docker compose run --rm create-snapshot"
-snapshot_name_format = "metis_l1_dtl.tar.lz4"
+snapshot_name_format = "{timestamp}-metis_l1_dtl.tar.lz4"
 snapshot_output_path = "/path/to/generated/snapshot" # Path where the generated snapshot is expected after the command is executed.
 compress_snapshot = true # LZ4 compress the snapshot if it isn't already.
 schedule_time = "0 1 * * *"  # Scheduled everyday at 1am
@@ -23,7 +23,7 @@ local_path = "/home/metis"
 start_chain_command = "./ethd up"
 stop_command = "./ethd stop" # Leave empty if stop is not needed.
 snapshot_command = "docker compose run --rm create-snapshot"
-snapshot_name_format = "metis_l1_dtl.tar.lz4"
+snapshot_name_format = "{timestamp}-metis_l1_dtl.tar.lz4"
 snapshot_output_path = "/path/to/generated/snapshot" # Path where the generated snapshot is expected after the command is executed.
 compress_snapshot = false # LZ4 compress the snapshot if it isn't already.
 schedule_time = "0 1 * * *"  # Scheduled everyday at 1am
@@ -31,6 +31,12 @@ schedule_time = "0 1 * * *"  # Scheduled everyday at 1am
 # Arch config
 running_mode = "arch"
 
+[[directories]]
 watch_directory = "/path/to/watch"
-archive_directory = "/path/to/final/destination"
-keep_latest = 2  # Number of latest snapshots to keep
+archive_directory = "/path/to/archive"
+keep_latest = 4
+
+[[directories]]
+watch_directory = "/path/to/watch"
+archive_directory = "/path/to/archive"
+keep_latest = 4

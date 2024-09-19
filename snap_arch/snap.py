@@ -55,7 +55,7 @@ def perform_snapshot(chain, config):
     LOGGER.info("Snapshot completed.")
 
     # Name format for the snapshot
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    timestamp = datetime.now().strftime('%Y%m%d')
     snapshot_name = chain['snapshot_name_format'].replace("{timestamp}", timestamp)
     snapshot_path = os.path.join(tempfile.mkdtemp(), snapshot_name)
 
