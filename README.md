@@ -14,22 +14,29 @@ Snap Mode: This mode is intended to run locally on the server hosting the blockc
 
 Arch Mode: In this mode, Snap-Arch monitors a specified directory for new file uploads. Once a file upload is confirmed as complete, the tool automatically moves the file to the archive folder. When the number of files in the archive exceeds the keep_latest threshold, Snap-Arch will delete the oldest files, ensuring that only the most recent snapshots are retained.
 
-### Install Dependencies
+## Installation
 
 ```shell
-poetry install
+$ pipx install git+https://github.com/CryptoManufaktur-io/snap-arch.git
+$ snap-arch --config /path/to/config.toml
+```
+
+### Development
+
+```shell
+$ poetry install
 ```
 
 ### Running locally
 
 ```shell
-poetry run snap-arch --config /path/to/config.toml
+$ poetry run snap-arch --config /path/to/config.toml
 ```
 
 ### Building Executable
 
 ```shell
-./build.sh
+$ ./build.sh
 ```
 
 ## License
