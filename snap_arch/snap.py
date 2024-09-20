@@ -84,6 +84,12 @@ def perform_snapshot(chain, config):
     elif config['protocol'] == 'mv':
         execute_command(f"mv {snapshot_path} {chain['destination_path']}/{snapshot_name}")
 
+    LOGGER.info("File transferred.")
+
+    execute_command(f"rm {snapshot_path}")
+
+    LOGGER.info("Temporary file deleted.")
+
 def schedule_job(chain, config):
     cron_expression = chain['schedule_time']
     cron = croniter(cron_expression, datetime.now())
