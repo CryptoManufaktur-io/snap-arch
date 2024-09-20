@@ -7,26 +7,38 @@ protocol = "scp"
 credentials = "username"
 
 [[chains]]
+# Metis l2geth snapshot
 destination_path = "/path/to/uploads/folder"
-local_path = "/home/metis"
-start_chain_command = "./ethd up"
+local_path = "/home/user/metis"
 stop_command = "./ethd stop" # Leave empty if stop is not needed.
-snapshot_command = "docker compose run --rm create-snapshot"
-snapshot_name_format = "{timestamp}-metis_l1_dtl.tar.lz4"
-snapshot_output_path = "/path/to/generated/snapshot" # Path where the generated snapshot is expected after the command is executed.
-compress_snapshot = true # LZ4 compress the snapshot if it isn't already.
-schedule_time = "0 1 * * *"  # Scheduled everyday at 1am
+start_chain_command = "./ethd up"
+snapshot_command = """
+rm -f /tmp/l2geth.tar.lz4 &&
+docker run --rm -d --name metis_l2geth_temp -v metis_l2geth-data:/root/.ethereum debian:bookworm-slim sleep infinity &&
+docker cp metis_l2geth_temp:/root/.ethereum/geth/chaindata - | lz4 -z - /tmp/l2geth.tar.lz4 &&
+docker stop metis_l2geth_temp
+"""
+snapshot_name_format = "{timestamp}-metis-mainnet-l2geth-full-finaltag.tar.lz4"
+snapshot_output_path = "/tmp/l2geth.tar.lz4" # Where the snapshot will be temporarily stored by the snapshot_command
+schedule_time = "0 4 * * 1"  # Scheduled to run every Monday at 04:00
+compress_snapshot = false
 
 [[chains]]
+# Metis L1 DTL
 destination_path = "/path/to/uploads/folder"
-local_path = "/home/metis"
-start_chain_command = "./ethd up"
+local_path = "/home/user/metis"
 stop_command = "./ethd stop" # Leave empty if stop is not needed.
-snapshot_command = "docker compose run --rm create-snapshot"
-snapshot_name_format = "{timestamp}-metis_l1_dtl.tar.lz4"
-snapshot_output_path = "/path/to/generated/snapshot" # Path where the generated snapshot is expected after the command is executed.
-compress_snapshot = false # LZ4 compress the snapshot if it isn't already.
-schedule_time = "0 1 * * *"  # Scheduled everyday at 1am
+start_chain_command = "./ethd up"
+snapshot_command = """
+rm -f /tmp/l1dtl.tar.lz4 &&
+docker run --rm -d --name metis_l1dtl_temp -v metis_l1dtl-data:/data debian:bookworm-slim sleep infinity &&
+docker cp metis_l1dtl_temp:/data/. - | lz4 -z - /tmp/l1dtl.tar.lz4 &&
+docker stop metis_l1dtl_temp
+"""
+snapshot_name_format = "{timestamp}-metis-mainnet-l1dtl-finaltag.tar.lz4"
+snapshot_output_path = "/tmp/l1dtl.tar.lz4" # Where the snapshot will be temporarily stored by the snapshot_command
+schedule_time = "0 5 * * 1"  # Scheduled to run every Monday at 05:00
+compress_snapshot = false
 
 # Arch config
 running_mode = "arch"
