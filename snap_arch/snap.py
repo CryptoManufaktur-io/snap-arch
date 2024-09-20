@@ -70,6 +70,12 @@ def perform_snapshot(chain, config):
         # Otherwise just move it to the temp folder.
         execute_command(f"mv {chain['snapshot_output_path']} {snapshot_path}")
 
+    if should_stop_start:
+        # Start the chain again
+        start_chain_command = chain['start_chain_command']
+        execute_command(start_chain_command)
+        LOGGER.info("Chain started again.")
+
     # Transfer snapshot to server
     if config['protocol'] == 'scp':
         scp_transfer(snapshot_path, chain['destination_path'], config['server'], config['credentials'])
@@ -77,12 +83,6 @@ def perform_snapshot(chain, config):
         rsync_transfer(snapshot_path, chain['destination_path'], config['server'], config['credentials'])
     elif config['protocol'] == 'mv':
         execute_command(f"mv {snapshot_path} {chain['destination_path']}/{snapshot_name}")
-
-    if should_stop_start:
-        # Start the chain again
-        start_chain_command = chain['start_chain_command']
-        execute_command(start_chain_command)
-        LOGGER.info("Chain started again.")
 
 def schedule_job(chain, config):
     cron_expression = chain['schedule_time']
